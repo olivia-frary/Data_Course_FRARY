@@ -32,7 +32,7 @@
 bob = 3+4 # This assigns the evaluated function (3 + 4) to an object (like a variable) called "bob"
 # bob should equal 7
 jane <- 5*2 # This assigns the value of 5 times 2 to an object called "jane" - Either symbol works
-
+jane- bob
 # LOGICAL EVALUATIONS
 
 # R can process a host of logical evaluations.  For example we can ask whether bob or jane is greater...
@@ -63,13 +63,19 @@ jane == 10
 # That stands for "concatenate" and allows you to enter a series of values to be saved to a single object:
 billy = c(2,3,4,5,6) # "billy" is now a NUMERIC VECTOR of 5 values
 # c() requires you to separate the various elements with a comma
+is.vector(billy) # numeric vector
 
 # This works for STRINGS as well. Strings are made up of characters
 suzy = c("This","is","a","character","vector") # notice how each string is enclosed in quotes. That tells R it is a string
-
+billy+suzy # you can't do math on words
+tommy <- c("1",2,3,4,5,TRUE,NA)
 # Think of these values (billy and suzy) like lists.  They have inherent order, so we can access any part of them:
 
 billy[1] # The brackets [] allow you to pick one or more elements from an object.  Here, we asked for the first element
+billy[1:2]
+billy[c(1,3)] # made a temporary vector to be able to call the elements needed
+suzy[4:5]
+
 # What value would billy[3] give you?
 
 # If our vectors are the same lengths, we can easily combine them to form "2-dimensional" data. Most data you
@@ -97,7 +103,12 @@ data
 # in R, the brackets to access an element accept input as follows: [row,column]
 # So to get the element in row 1, column 3 we write:
 
-data[1,3]
+data[1,3] # row,column
+data[,3] # all the values of the third column
+data[5,] # all values on 5th row
+
+data[,3] > .5
+data[data[,3]>.5,] # all rows where the mass is greater than /5
 
 # This kind of access is very useful. To add the mass of the first 5 flies we caught, you can write:
 
