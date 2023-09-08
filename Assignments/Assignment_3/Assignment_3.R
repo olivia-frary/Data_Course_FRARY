@@ -19,18 +19,18 @@
 # Vector operations! ####
 
 # Vectors are 1-dimensional series of values in some order
-1:10 # ':' only works for integers
+1:10 # ':' only works for integers # this just displays the vector
+# displayed a character vector of length 26
 letters # built-in pre-made vector of a - z
 
 
-
-vector1 <- c(1,2,3,4,5,6,7,8,9,10)
+vector1 <- c(1,2,3,4,5,6,7,8,9,10)# numeric vectors of length 10
 vector2 <- c(5,6,7,8,4,3,2,1,3,10)
 vector3 <- letters # letters and LETTERS are built-in vectors
 
-vector1 + 5
-vector2 / 2
-vector1*vector2
+vector1[3] + 5 # five was added to the third element of vector 1
+vector2[2] / 2
+vector1*vector2 # use vectors of the same length to do math
 
 vector3 + 1 # can't add 1 to "a"
 
@@ -64,13 +64,18 @@ dat <- iris # can rename the object to be easier to type if you want
 
 # ways to get a peek at our data set
 names(dat)
-dim(dat)
+dim(dat) # this is a numeric vector of length 2, can be used for average
+nrow(dat) # same as above
 head(dat)
 
 
+
 # You can access specific columns of a "data frame" by name using '$'
-dat$Species
+dat$Species # this is filled with 'factors'
+class(dat$Species)
 dat$Sepal.Length
+levels(dat$Species)
+
 
 # You can also use square brackets to get specific 1-D or 2-D subsets of a data frame (rows and/or columns)
 dat[1,1] # [Rows, Columns]
@@ -85,7 +90,7 @@ letters[c(1,3,5,7)]
 
 # Can make a quick plot....just give vectors for x and y axes
 plot(x=dat$Petal.Length, y=dat$Sepal.Length)
-plot(x=dat$Species, y=dat$Sepal.Length)
+plot(x=dat$Species, y=dat$Sepal.Length) # did this cuz of the x factor
 
 
 # Object "Classes" ####
@@ -96,7 +101,7 @@ class(dat$Species)
 
 # plot() function behaves differently depending on classes of objects given to it!
 
-# Check all classes (for each column in dat)
+# Check all classes (for each column in dat), str for structure
 str(dat)
 
 # "Classes" of vectors can be changed if needed (you'll need to, for sure, at some point!)
@@ -109,7 +114,7 @@ class(nums) # make sure it's numeric
 as.factor(nums) # show in console
 nums_factor <- as.factor(nums) #assign it to a new object as a factor
 class(nums_factor) # check it
-
+levels(nums_factor)
 
 # convert numeric to character
 as.character(vector1)
@@ -123,7 +128,7 @@ as.numeric(vector3)
 
 #check it out
 plot(nums) 
-plot(nums_factor)
+plot(nums_factor) # this is a bar plot
 # take note of how numeric vectors and factors behave differently in plot()
 
 
@@ -138,6 +143,8 @@ median(vector1)
 mean(vector1)
 range(vector1)
 summary(vector1)
+
+table(nums)
 
 # cumulative functions
 cumsum(vector1)
@@ -157,26 +164,36 @@ dbinom(50,100,.5) # probability of getting exactly 50 heads out of 100 coin flip
 
 seq(2,150,2) # here's the code to get a list of the even numbers between 2 and 150
 
-
+df <- iris[seq(2,150,2),]
+head(df)
 
 # 2.  Create a new object called iris_chr which is a copy of iris, except where every column is a character class
 
-
+iris_chr <- iris
+for(i in 1:ncol(iris_chr)){
+  iris_chr[,i] <- as.character(iris_chr[,i])
+}
 
 # 3.  Create a new numeric vector object named "Sepal.Area" which is the product of Sepal.Length and Sepal.Width
 
-
+Sepal.Area <- iris$Sepal.Length*iris$Sepal.Width
+class(Sepal.Area)
 
 # 4.  Add Sepal.Area to the iris data frame as a new column
 
+iris$Sepal.Area <- iris$Sepal.Length*iris$Sepal.Width
+head(iris)
 
 
 # 5.  Create a new dataframe that is a subset of iris using only rows where Sepal.Area is greater than 20 
       # (name it big_area_iris)
 
+big_area_iris <- iris[Sepal.Area > 20,]
+head(big_area_iris)
 
 
 # 6.  Upload the last numbered section of this R script (with all answers filled in and tasks completed) 
       # to canvas
       # I should be able to run your R script and get all the right objects generated
+
 
