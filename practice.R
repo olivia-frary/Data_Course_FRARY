@@ -72,6 +72,12 @@ for(i in names(iris)){
   print(summary(x))
 }
 
+#### Week 2 Practice ####
+vector1 <- list.files(path = "Data/data-shell/names",
+                      pattern = ".csv",
+                      recursive = TRUE,
+                      full.names = TRUE)
+class(vector1)
 #### Vector Practice Week 3 ####
 # Exercise 1 
 x <- c(4,6,5,7,10,9,4,15)
@@ -128,7 +134,86 @@ for (i in df$country)
    rbind(df, df[,]) 
   }
 
-#### Sequences Practice Week 3 ####
-seq(1,1000,2)
+#### Characters Practice Week 3 ####
+# exercise 1
+library(tidyverse)
+vector <- ("Good morning! ")
+nchar(vector)
+# exercise 2
+x <- c("Open", "Sesame ")
+y <- c("You", "Suck.")
+nchar(x) # creates a vector with the two lengths
+nchar(c(x,y))
 
+#### Sequences Practice Week 3 ####
+# exercise 1
+seq(1,10,by=2)
+seq(1,10,by=3)
+#exercise 2
+seq(9,45,9)
+#exercise 3
+seq(1,12,length.out=5)
+seq(1,10,length.out=3) # breaks it into 3 pieces and rounds
+# exercise 4
+x = 1:5
+rep(x,2)
+rep(x,2,each=2)
+rep(x,each=4)
+# in class challenge
+seq(1,1000,2)
 rep(seq(1,1000,2),100)
+
+
+#### Indexing Practice Week 3 ####
+# exercise 1
+x = c("ss","aa","ff","kk","bb")
+x[1]
+x[c(1,3)]
+# exercise 2
+d = data.frame(Name = c("Betty","Bob","Susan"),
+               Age = seq(20,30,length.out=3),
+               Height_cm = c(490,22,0))
+d[c("Name","Age")] # shows the whole columns of name and age
+d[c("Age","Name","Height_cm")][1,]
+# exercise 3
+d$Name
+d$Age[2]
+# exercise 4
+d$Age > 20
+d[d$Age > 20,] # only returns rows where age > 20
+
+
+#### Missing Values Practice Week 3 ####
+# exercise 1
+X = c(NA,3,14,NA,33,17,NA,41)
+is.na(X)
+X[!is.na(X)] # returns the values that are NOT na
+
+
+
+#### Loops Practice Week 3 ####
+# exercise 1
+for(i in 1:3){
+  x <- paste0("Number ",i)
+  print(x)
+}
+
+planets <- c("Mercury","Venus","Earth","Mars",
+             "Jupiter","Saturn","Uranus","Neptune")
+n <- 1
+newVector <- c()
+for(i in planets){
+  newVector[n] <- paste0(i,i)
+  n=n+1
+}
+newVector
+?paste0
+
+for(i in 1:7){
+  print(i^3)
+}
+
+# exercise 2
+for(i in ncol(iris)){
+  x <- c(iris[1,1])
+}
