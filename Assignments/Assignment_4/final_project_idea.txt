@@ -1,0 +1,10 @@
+# Task 2
+My idea would be to look at injuries that dancers have had throughout their careers to see which are most prevalent and which lead to the end of a career. I see this requiring multiple data sets that I make figures on for the report. 
+
+# Task 3
+For this, my dream data set would have columns of type of dancer (modern, ballet, hip-hop, folk, etc.) and type of injury. It would be interesting to see columns on length of recovery, whether surgery was required, a pain scale, satisfaction with recovery, whether they continued dancing. The rows would hopefully be cases. A lot of this is survey data. I have seen papers but haven't been able to find any supplementary materials that I could use data from yet. I have also been led to NEISS-AIP, but have trouble understanding their website. 
+
+# In case a data set can't be found
+While I have more of a dance interest, I know that it is a bit specific. I would be okay working with a dataset on sports injuries, especially if dance is included. 
+
+I also have a backup dataset to work with if these don't work. It is the National College Health Assessment for UVU in Spring 2021. With this I would like to see if there are correlations between the reported sleep habits and other reported health issues.
