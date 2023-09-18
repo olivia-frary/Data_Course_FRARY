@@ -3,9 +3,11 @@
 # Load ggplot2 (it is included in the tidyverse package) ####
 library(tidyverse)
 
+options(scipen=999)
+
 # Load the data we will work with (built-in to ggplot)
 data("midwest", package = "ggplot2")
-
+# demographics for midwestern states by county
 # Intro to ggplot syntax
 
 # The syntax for constructing ggplots could be puzzling if you are a beginner or work primarily with base graphics. 
@@ -28,6 +30,7 @@ ggplot(midwest) # what do you see?
 
 # give it some aesthetics to work with...
 ggplot(midwest, aes(x=area, y=poptotal))  # area and poptotal are columns in 'midwest'
+# x has to be a column name
 
 # A blank ggplot is drawn. Even though the x and y are specified, there are no points or lines in it. 
 # This is because, ggplot doesn’t assume that you meant a scatterplot or a line chart to be drawn. 
@@ -41,16 +44,16 @@ ggplot(midwest, aes(x=area, y=poptotal))  # area and poptotal are columns in 'mi
 ggplot(midwest, aes(x=area, y=poptotal)) + geom_point() # The "+" tells ggplot to add another layer to our base plot
 
 # Add another geom ... a trendline:
-ggplot(midwest, aes(x=area, y=poptotal)) + geom_point() + geom_smooth(method = "lm")
+ggplot(midwest, aes(x=area, y=poptotal)) + geom_point() + geom_smooth(method = "lm", color="red", linetype=2)
 # The line of best fit is in blue. Can you find out what other method options are available for geom_smooth? 
 
 # Store your plot as an object to add to...
 p <- ggplot(midwest, aes(x=area, y=poptotal)) + geom_point() + geom_smooth(method = "lm")
-
+p
 # Zoom in
-p + lims(x=c(0,0.1),y=c(0,1000000)) # what did this do?
-p + coord_cartesian(xlim=c(0,0.1), ylim=c(0, 1000000)) # how is this different?
-
+p + lims(x=c(0,0.1),y=c(0,1000000)) # what did this do? - changes the scale of the axis
+p + coord_cartesian(xlim=c(0,0.1), ylim=c(0, 1000000)) # how is this different? - the line has a different angle
+# this helps to add layers
 # Store this new zoomed-in plot
 p2 <- p + coord_cartesian(xlim=c(0,0.1), ylim=c(0, 1000000))
 
@@ -62,10 +65,10 @@ p2 + labs(title="Area Vs Population",
           caption="Midwest Demographics")
 
 # Nifty!  So here's the full function call to make this plot:
-ggplot(midwest, aes(x=area, y=poptotal)) + 
-  geom_point() + 
+ggplot(midwest, aes(x=area, y=poptotal)) + # these are the global aesthetics for the rest of the line - can be overwritten later
+  geom_point() +  # geompoint has inherited the global aesthetics from above
   geom_smooth(method="lm") + 
-  coord_cartesian(xlim=c(0,0.1), ylim=c(0, 1000000)) + 
+  coord_cartesian(xlim=c(0,0.1), ylim=c(0, 1000000)) + # this will zoom in without deleting any points
   labs(title="Area Vs Population", subtitle="From midwest dataset", y="Population", x="Area", caption="Midwest Demographics")
 
 # Let's make it pretty ####
@@ -91,7 +94,8 @@ p3
 
 # Don't like those colors?
 p3 + scale_color_brewer(palette = "Set1")
-
+mycolor <- c("#c1593c","#688e52","#a17fc1","#8997b2","#c4a113")
+p3 + scale_color_manual(values=mycolor)
 # Want more color choices? You can check them out in the RColorBrewer package, or even make your own
 library(RColorBrewer)
 brewer.pal.info
@@ -162,7 +166,7 @@ ggplot(MplsStops, aes(x=lat,y=long,color=race)) + geom_point() + theme_minimal()
 
 ggplot(MplsStops, aes(x=lat,y=long,color=race)) + geom_point() + theme_minimal() + facet_wrap(~race) # "overplotting!?"
 
-
+#ggsave('./directory') #will save the last plot that you plotted as a file
 ggplot(MplsStops,)
 
 # Check out the issue with some random data
