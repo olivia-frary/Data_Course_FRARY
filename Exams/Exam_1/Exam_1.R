@@ -35,6 +35,20 @@ state_max_fatility_rate <- data.frame(Province_State,Maximum_Fatality_Ratio)
 # ordered the data in decreasing order
 state_max_fatility_rate <- state_max_fatility_rate[order(state_max_fatility_rate$Maximum_Fatality_Ratio, decreasing=TRUE),]
 
+#peaks <- c()
+# for(i in unique(df$Province_State)){
+#  x <- df[df$Province_State == i,]
+#  max(x$Case_Fatality_Ratio, na.rm = TRUE)
+#  peaks[i] <- y
+#}
+#state max fatality rate <- data.frame(State = names(peaks),
+#                                      Peak = peaks)
+
+#df %>%
+#  group_by(Province_State) %>%
+#  summarize(Max = max(Case_Fatality_Ratio, na.rm=TRUE))
+  
+
 # Task V
 # turn my fatality data into a numeric data type for graphing.
 state_max_fatility_rate$Maximum_Fatality_Ratio <- as.numeric(state_max_fatility_rate$Maximum_Fatality_Ratio)
@@ -46,3 +60,10 @@ ggplot(state_max_fatility_rate, aes(x=reorder(Province_State, -Maximum_Fatality_
   xlab("State") + ylab("Maximum Fatility Ratio")
 
 # no bonus question because I am quite sick
+
+#data %>%
+#  group_by(Last_Update) %>%
+#  summarize(cumulative_deaths = sum(Deaths, na.rm = TRUE))
+#ggplot(aes(x=Last_Update, y=cumulative_deaths)) +
+#  geom_point()
+
