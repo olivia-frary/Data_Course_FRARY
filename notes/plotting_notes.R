@@ -28,4 +28,4 @@ ggplot(mpg,aes(x=hwy,
   geom_smooth(method=lm,se=FALSE) +
   facet_wrap(~trans)
 
-# facet_warap(~data,scales= 'free') gets rid of the N/As
+# facet_wrap(~data,scales= 'free') gets rid of the N/As
