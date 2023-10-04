@@ -52,7 +52,10 @@ dat_dilute +
 # task 4
 # generate an animated plot that matches assignment one.
 # create a vector that has the mean abs by hr, id, dilution, substrate
-p1 <- aggregate(abs ~ hr+sample_id+dilution+substrate, data=dat, FUN=mean)
+p1 <- aggregate(abs ~ hr + 
+                      sample_id + 
+                      dilution + 
+                      substrate, data=dat, FUN=mean)
 # new data frame with only the info for Itaconic Acid and pipe into plot
 p2 <- p1[p1$substrate == "Itaconic Acid",] %>% 
   ggplot(aes(x=hr,y=abs,color=sample_id)) +
@@ -63,7 +66,7 @@ p2 <- p1[p1$substrate == "Itaconic Acid",] %>%
          y="Absorbance",
          color="Sample ID") +
     gganimate::transition_reveal(hr)
-p2
+p2 # run the plot
 
 
 
