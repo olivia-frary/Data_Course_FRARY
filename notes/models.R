@@ -101,7 +101,7 @@ predict(m5,a)
 # new built in 
 Titanic %>%  as.data.frame()
 # so far we've been predicting continuous variable, what about categorical
-# logistice regression -> outcome is T/F
+#### logistic regression -> outcome is T/F ####
 df <- read_csv("./Data/GradSchool_Admissions.csv")
 df <- 
   df %>% 
@@ -109,8 +109,26 @@ df <-
 # logistic -> family = 'binomial'
 m6 <- glm(data = df,
     formula = admit~gre+gpa+rank,
-    family = "binomial")
+    family = "binomial") # the predictors are gre, gpa, and rank (separate)
 m6 # these are log odds, we want percentages
+# interaction is shown with the *
+m7 <- glm(data = df,
+          formula = admit~gre*gpa*rank,
+          family = "binomial")
+
+compare_performance(m6,m7) %>% plot # comparing the models
+# magic trick to get the mathematically best model - might not fit reality
+# come up with the best most complicated model.
+library(MASS)
+m7 <- glm(data = df,
+          formula = admit~gre*gpa*rank,
+          family = "binomial")
+step <- stepAIC(m7)
+# AIC will find the simplelist best model
+step$formula # this spits out the best simplified model
+
+mod_best <- glm(data=df, family="binomial", formula = step$formula)
+compare_performance(m6,m7,mod_best) %>% plot
 
 library(modelr)
 add_predictions(df,m6,type="response") %>% 
@@ -118,4 +136,70 @@ add_predictions(df,m6,type="response") %>%
   ggplot(aes(x=gpa,y=pred,color=factor(rank))) +
   geom_smooth()
 
+p <- penguins
+m8 <- glm(data=p,formula=bill_length_mm ~ species*island*bill_depth_mm*flipper_length_mm*body_mass_g*sex*year)
+step1 <- stepAIC(m8)
+step1$formula
+# magic shortcut
+full_mod <- glm(data=p,formula=bill_length_mm ~ .^2)
+step1 <- stepAIC(m8)
+step1$formula
+best_mod1 <-  glm(data=penguins,formula=step1$formula)
+compare_performance(full_mod,best_mod1) %>% plot 
+# data science crime
+# there is no new data, made a model on the entire dataset
+# there is no real world left to train the model on.
+
+# train model on some data
+# test is on other data
+# we need to hide some of our data set and save it for testing.
+
+errors <- c()
+for(i in 1:100){
+  penguins <- 
+    penguins %>% 
+    mutate(newcol=rbinom(nrow(penguins),1,.8))
+  # set 1s to train and 0s to test
+  train <- penguins %>% filter(newcol == 1)
+  test <- penguins %>% filter(newcol == 0)
   
+  # train model on train
+  mod_best <- glm(data=train,formula=step1$formula)
+  
+  # test model on test set
+  predictions <- 
+    add_predictions(test,mod_best)
+  # calculate the absolute difference between actual and predicted bill length
+  predictions <- 
+    predictions %>% 
+    mutate(resid = abs(pred - bill_length_mm)) # what is leftover
+  mean_error <- mean(predictions$resid,na.rm=TRUE)
+  errors[i] <- mean_error
+}
+
+errors
+data.frame(errors) %>% 
+  ggplot(aes(x=errors)) +
+  geom_density()
+
+.2*344 # let's train on 80%, test on 20%
+# add new column that is true false at 80% true
+penguins <- 
+penguins %>% 
+  mutate(newcol=rbinom(nrow(penguins),1,.8))
+# set 1s to train and 0s to test
+train <- penguins %>% filter(newcol == 1)
+test <- penguins %>% filter(newcol == 0)
+
+# train model on train
+mod_best <- glm(data=train,formula=step1$formula)
+
+# test model on test set
+predictions <- 
+add_predictions(test,mod_best)
+# calculate the absolute difference between actual and predicted bill length
+predictions <- 
+predictions %>% 
+  mutate(resid = abs(pred - bill_length_mm)) # what is leftover
+mean_error <- mean(predictions$resid,na.rm=TRUE)
+

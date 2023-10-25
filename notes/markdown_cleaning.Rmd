@@ -1,0 +1,58 @@
+---
+title: "Soil_Predators"
+author: "Olivia Frary"
+date: "2023-10-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+```
+
+This is text. I am going to load a data set and clean it. 
+The data set is summarized below:
+```{r}
+library(tidyverse)
+path <- "../Data/Soil_Predators.csv"
+df <- read_csv(path,skip=1,col_names=FALSE)
+badcolnames <- readLines(path,n=1)
+badcolnames <- badcolnames %>% str_replace_all(",_","_") %>% str_split(",") %>% unlist()
+
+df <- df %>% select(-c(X25,X26))
+
+names(df) <- badcolnames
+
+skimr::skim(df) %>% 
+  as.data.frame() %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_classic(lightable_options="hover")
+
+```
+
+
+# NOW I'M GONNA ANALYZE 
+First, an image
+```{r}
+#knitr::include_graphics(path to graphics)
+```
+
+List of Predator Species 
+```{r}
+df$Predator_species %>% unique
+```
+
+```{r}
+df$prey_richness <- 
+df %>% select(starts_with("Consumption")) %>% rowSums(na.rm=TRUE)
+
+p <- df %>% 
+  ggplot(aes(x=Predator_development_stage,y=prey_richness,color=Predator_sex))+
+  geom_boxplot() + 
+  theme_bw()
+plotly::ggplotly(p)
+```
+
+
+
+
+

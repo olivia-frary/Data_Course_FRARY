@@ -1,0 +1,52 @@
+#### Questions ####
+
+# Are any of your predicted response values from your best model scientifically
+# meaningless? Explain.
+
+# Model 4 tended to predict within the denser parts of the data. This could suggest
+# that it predicts the data well. There weren't any predicted points that were
+# wildly out of the ordinary. It is hard to see clear linear relationships in 
+# some of the plots so the predictions in those might not be as reliable as 
+# they don't follow a clear pattern. 
+
+
+# In your plots, did you find any non-linear relationships? Do a bit of 
+# research online and give a link to at least one resource explaining how to
+# deal with modeling non-linear relationships in R.
+
+# It was hard to say that any of these were good linear models. GrowthRate as
+# a function of Nitrogen stands out as one that seemed particularly non linear. 
+
+# https://rpubs.com/abbyhudak/nonlinreg
+# transform data to make it linear
+# fit non-linear functions to data
+# fit polynomial models to data 
+# you need to do your research to understand a non-linear function that would be
+# appropriate to represent your data. 
+
+
+# Write the code you would use to model the data found in 
+# “/Data/non_linear_relationship.csv” with a linear model (there are a few ways
+# of doing this)
+
+dat <- read_csv("../../Data/non_linear_relationship.csv")
+
+# I want to try transforming the data to fit it linearly
+# It looks exponential so lets ln() it.
+train_dat <- dat
+train_dat$log_response <- log(dat$response)
+lin_mod <- glm(data=train_dat, formula = log_response~predictor)
+lin_mod %>% summary
+
+# transformed data with linear regression line
+train_dat %>% 
+ggplot(aes(x=predictor,y=log_response)) +
+  geom_point() +
+  geom_smooth(method="lm")
+
+# compared to the non-transformed data with a linear regression line
+dat %>% 
+  ggplot(aes(x=predictor,y=response)) +
+  geom_point() + 
+  geom_smooth(method="lm")
+ 
