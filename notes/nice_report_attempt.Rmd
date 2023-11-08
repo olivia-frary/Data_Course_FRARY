@@ -1,0 +1,89 @@
+---
+title: "Models of MPG Data"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(easystats)
+library(modelr)
+library(MASS)
+```
+
+```{r, data}
+skimr::skim(mpg) %>% 
+  as.data.frame() %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_classic(lightable_options="hover")
+```
+
+### Initial visualization of data
+
+The following plot looks at how mpg in in the city is related to displacement
+
+```{r, initial_plot}
+mpg %>% 
+  ggplot(aes(x=displ,y=cty)) +
+  geom_point() +
+  theme_minimal()
+```
+
+```{r include=FALSE}
+m1 <- glm(data=mpg, formula= cty~displ)
+m2 <- glm(data=mpg,formula= cty~year*cyl*trans*drv)
+step1 <- stepAIC(m2)
+step1$formula
+m3 <-  glm(data=mpg,formula=step1$formula)
+
+```
+
+### Models
+
+The formulas for models 1, 2, and 3 are shown and compared below
+
+```{r echo=FALSE}
+m1$formula
+m2$formula
+m3$formula
+compare_performance(m1,m2,m3) %>% plot 
+```
+
+### Predictions
+
+Using model 3, we made predictions on actual mpg data
+
+```{r}
+df <- mpg
+df %>% 
+  add_predictions(m3) %>% 
+  ggplot(aes(x=displ,y=cty)) +
+  geom_point() +
+  geom_point(aes(y=pred), col="red") +
+  geom_segment(aes(x=seq_along(displ),y=cty,xend=seq_along(displ),yend=pred)) +
+  theme_minimal()
+# look into geom_segment to get the vertical lines
+```
+
+Using model 3, we made predictions on hypothetical mpg data
+
+```{r}
+# df
+# hyp_dat <- as.data.frame(year=c(2008,2003,1999),
+#                          cyl=c(4.0,6.0,8.0),
+#                          trans=c("auto(l5)","(manual(m6)","auto(av)"),
+#                          drv=c("f","4","f"))
+
+# also look into broo::tidy()
+
+```
+
+
+
+
+

@@ -1,0 +1,44 @@
+---
+title: "Untitled"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+Today is `r Sys.Date()`, the back-ticks do inline r code.
+
+YAML Header, has to stay here
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+# shows the code as well as the results, echo = FALSE if giving report to superior
+# warning = false so warnings aren't shown in the doc
+```
+
+# biggest header
+## next header
+### smaller header
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+[click here](http://rmarkdown.rstudio.com) -> another way to write a link
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+**bold**
+
+*italic*
+
+```{r cars, echo=TRUE, fig.height=3, fig.width=3, message=FALSE, warning=FALSE, paged.print=FALSE}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE, fig.height=3 , fig.width=3, fig.align='center'}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -136,6 +136,10 @@ add_predictions(df,m6,type="response") %>%
   ggplot(aes(x=gpa,y=pred,color=factor(rank))) +
   geom_smooth()
 
+add_predictions(df,m6,type="response") %>% 
+  ggplot(aes(x=admit,y=pred,fill=factor(rank))) +
+  geom_violin()
+
 p <- penguins
 m8 <- glm(data=p,formula=bill_length_mm ~ species*island*bill_depth_mm*flipper_length_mm*body_mass_g*sex*year)
 step1 <- stepAIC(m8)

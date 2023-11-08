@@ -1,0 +1,10 @@
+make navigational tabs at the top of all your pages
+make sure your cv links your website
+megfrisby4
+chatgpt for css and html
+
+shiny app must be 
+new r project
+create shiny
+create git repo
+publish through with the shiny app. 

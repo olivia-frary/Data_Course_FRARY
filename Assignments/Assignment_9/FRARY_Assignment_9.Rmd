@@ -1,0 +1,274 @@
+---
+title: "FRARY Assignment 9"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+---
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+**This report looks at grad school admission data.**
+
+Setting up the workspace:
+
+```{r libraries, echo=TRUE}
+library(tidyverse)
+library(modelr)
+library(easystats)
+library(GGally)
+library(skimr)
+library(MASS)
+```
+
+```{r data}
+grad_admit <- read_csv("../../Data/GradSchool_Admissions.csv") %>% 
+              mutate(admit = as.logical(admit))
+```
+---
+
+### The Data
+
+Let's see what the data looks like.
+
+```{r glimpse, echo=TRUE}
+glimpse(grad_admit)
+```
+
+```{r plotsum, echo=TRUE}
+ggpairs(grad_admit)
+```
+<br>
+The boxplot of rank and admission suggests that rank could have an influence on your admission to grad school.
+<br>
+
+`# show a layout of the data, the percentiles and distributions, using skim`
+
+```{r skim}
+# show a layout of the data, the percentiles and distributions
+skim(grad_admit) %>% 
+  as.data.frame() %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_classic(lightable_options="hover")
+```
+<br>
+The data for **admit** was converted to a logical upon loading the data in. 
+
+---
+
+### Initial Plots
+
+The following plots help to visualize the data. 
+They are faceted to show the difference between the institution rankings. The 
+<i>first</i> plot shows whether you were admitted based on your **gpa**. The 
+<i>second</i> plot shows whether you were admitted based on your **gre** score
+
+```{r plots}
+grad_admit %>% 
+  ggplot(aes(x=admit, y=gpa, fill=admit)) +
+  geom_violin(alpha = 0.6) +
+  facet_wrap(~rank) +
+  theme_minimal()
+grad_admit %>% 
+  ggplot(aes(x=admit, y=gre, fill=admit)) +
+  geom_violin(alpha = 0.6) +
+  facet_wrap(~rank) +
+  theme_minimal()
+```
+
+---
+
+### Models
+
+I have made models of the response, whether you were accepted to grad school or
+not, with varying complexities.
+
+```{r models, echo=TRUE}
+m1 <- glm(data=grad_admit, formula=admit~gre+gpa,
+          family = "binomial")
+
+m2 <- glm(data=grad_admit, formula=admit~gre+gpa+rank,
+          family = "binomial")
+
+m3 <- glm(data=grad_admit, formula=admit~gre*gpa,
+          family = "binomial")
+
+m4 <- glm(data=grad_admit, formula=admit~gre*gpa+rank,
+          family = "binomial")
+
+m5 <- glm(data=grad_admit, formula=admit~gre*gpa*rank,
+          family = "binomial")
+```
+
+I used model 5 (m5) to find the "best" model with a stepwise AIC function
+
+```{r best_model, echo=TRUE}
+step <- stepAIC(m5, trace=0)
+m6 <- glm(data=grad_admit, formula=step$formula,
+          family = "binomial")
+```
+
+Next, I compared the performance of the models and included their performance scores
+
+```{r compare_models, echo=TRUE}
+comp <- compare_performance(m1,m2,m3,m4,m5,m6,rank=TRUE)
+# full table is too long to read out nicely
+comp[,c("Name","Performance_Score")]
+# now lets plot them
+plot(comp)
+```
+
+The comparison shows that model 4 (m4) and model 6 (m6) perform identically even though they are shown to have different formulas. The formulas might be able to be simplified to equal eachother.
+I will use model 4 as the best model to train off of. 
+
+```{r show_formulas, echo=TRUE}
+m4$formula
+m6$formula
+```
+
+---
+
+### Predictions
+
+First let's see how all the models create different predictions. These plots show
+the probability that someone will be accepted to grad school base on their **gpa**
+or **gre** score.
+
+```{r plot_predictions}
+grad_admit %>% 
+  gather_predictions(m1,m2,m3,m4,m5,m6,type = "response") %>% # will show probabilities
+  ggplot(aes(x=gpa,y=pred,color=model)) +
+  geom_point(alpha=0.5) +
+  geom_smooth(method = "lm", se=FALSE) +
+  facet_wrap(~rank) +
+  theme_minimal() +
+  scale_color_viridis_d()
+
+grad_admit %>% 
+  gather_predictions(m1,m2,m3,m4,m5,m6,type = "response") %>% # will show probabilities
+  ggplot(aes(x=gre,y=pred,color=model)) +
+  geom_point(alpha=0.5) +
+  geom_smooth(method = "lm", se=FALSE) +
+  facet_wrap(~rank) +
+  theme_minimal() +
+  scale_color_viridis_d()
+```
+
+From these plots, it is hard to see how the models compare. If we compare the predictions
+of the models with a violin plot, we see that the distributions for those accepted or denied
+admission do not match the predictions well.
+
+```{r compared_violins}
+grad_admit %>% 
+  gather_predictions(m1,m2,m3,m4,m5,m6,type = "response") %>% # will show probabilities
+  ggplot(aes(x=admit,y=pred,fill=admit)) +
+  geom_violin(alpha=0.6)+
+  facet_wrap(~model) +
+  theme_minimal()
+```
+
+If we just look at the predictions themselves, the points that were actually accepted
+into grad school seem rather scattered throughout the plots for **gpa** and **gre**.
+
+```{r plot_admittance_predictions}
+grad_admit %>% 
+  gather_predictions(m1,m2,m3,m4,m5,m6,type = "response") %>% # will show probabilities
+  ggplot(aes(x=gpa,y=pred)) +
+  geom_point(alpha=0.5, aes(color=admit)) +
+  theme_minimal() +
+  scale_color_viridis_d()
+grad_admit %>% 
+  gather_predictions(m1,m2,m3,m4,m5,m6,type = "response") %>% # will show probabilities
+  ggplot(aes(x=gre,y=pred)) +
+  geom_point(alpha=0.5, aes(color=admit)) +
+  theme_minimal() +
+  scale_color_viridis_d()
+```
+
+If we remember back to when we compared models and performance scores, none of the
+models were that great. The highest scores were in the 60's.
+
+If we just look at some of the predictions made by model 4 (which had a performance score
+of 61.76%), we can see how the predictions are turning out incorrect more often than we want.
+
+```{r show_prediction_df}
+df <- grad_admit
+df$pred_m4 <- m4$fitted.values
+head(df)
+```
+
+Still focusing on model 4,the violin plot faceted by institution rank shows issues with the prediction but it also reveals difference in predictions made based on the rank. If you are from a first ranked undergrad institution, the model predicts higher probabilities of getting accepted into grad school.
+
+```{r m4_violin}
+add_predictions(grad_admit,m4,type="response") %>% 
+  ggplot(aes(x=admit,y=pred,fill=admit)) +
+  geom_violin(alpha = 0.6) +
+  facet_wrap(~rank) +
+  theme_minimal()
+```
+
+These following plots of model 4 reflect the same pattern. You could have the same gpa or gre score as someone from a top-tier 
+school, but they will have a higher probability of being accepted
+to grad school (at least according to the model).
+
+```{r m4_lines}
+add_predictions(grad_admit,m4,type="response") %>% 
+  ggplot(aes(x=gpa,y=pred,color=factor(rank))) +
+  geom_point(alpha=0.5) +
+  geom_smooth() + 
+  theme_minimal() +
+  scale_color_viridis_d()
+add_predictions(grad_admit,m4,type="response") %>% 
+  ggplot(aes(x=gre,y=pred,color=factor(rank))) +
+  geom_point(alpha=0.5) +
+  geom_smooth() + 
+  theme_minimal() +
+  scale_color_viridis_d()
+```
+
+I want to check that model 4 behaves the same way when trained on just 80% of the
+data. The other 20% will be used to test the model.
+
+```{r m4_train, echo=TRUE}
+set.seed(123)
+training_samples <- caret::createDataPartition(seq_along(grad_admit$admit),
+                                               p=.8)
+train_data <- grad_admit[training_samples$Resample1,]
+test_data <- grad_admit[-training_samples$Resample1,] # all rows not in training_samples
+
+m4_formula <- m4$formula
+
+m4 <- glm(data=train_data, formula=m4_formula,
+          family="binomial")
+
+add_predictions(test_data,m4,type="response")
+```
+
+```{r m4_test}
+add_predictions(test_data,m4,type="response") %>% 
+  ggplot(aes(x=gpa,y=pred,color=factor(rank))) +
+  geom_point(alpha=0.5) +
+  geom_smooth() + 
+  theme_minimal() +
+  scale_color_viridis_d()
+
+add_predictions(test_data,m4,type="response") %>% 
+  ggplot(aes(x=gre,y=pred,color=factor(rank))) +
+  geom_point(alpha=0.5) +
+  geom_smooth() + 
+  theme_minimal() +
+  scale_color_viridis_d()
+```
+
+Even when predicting values outside of what the model was trained on, we see the same pattern. 
+
+Our main takeaways are this:
+
+  1. None of our models were very good
+  2. The rank of your undergraduate institution matters when applying to grad school. Top-tier schools are predicted to have higher acceptance rates. 
+  3. Generally, as gpa and gre scores increase, so do your chances of being admitted, however the predictions for this model were still all over the place. 
