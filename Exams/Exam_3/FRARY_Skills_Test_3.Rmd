@@ -1,0 +1,126 @@
+---
+title: "Exam 3"
+author: "Olivia Frary"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 4
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+#### Task 1: Load in and clean **FacultySalaries_1995.csv** and replicate graph
+
+The libraries required for the project were loaded in.
+
+```{r libraries}
+# load in required libraries
+library(tidyverse)
+library(janitor)
+library(broom)
+```
+
+I tidied the data by separating it into different data frames and used pivot_longer() to fix the variable abnormalities.
+
+```{r data_one_tidy}
+#### load in and clean the data ####
+df <- read_csv("FacultySalaries_1995.csv") %>% 
+  clean_names()
+
+# separate the data frame out to do the pivot longers
+salary <- 
+  df %>% pivot_longer(ends_with("_salary"),
+                      names_to = "rank",
+                      values_to = "avg_salary",
+                      names_pattern = "avg_(.*)_prof_salary") %>% 
+  select(c("fed_id","univ_name","state","tier","rank","avg_salary"))
+
+comp <- 
+  df %>% pivot_longer(ends_with("_comp"),
+                      names_to = "rank",
+                      values_to = "avg_comp",
+                      names_pattern = "avg_(.*)_prof_comp") %>% 
+  select(c("fed_id","univ_name","state","tier","rank","avg_comp"))
+
+number <- 
+  df %>% pivot_longer(ends_with("_profs"),
+                      names_to = "rank",
+                      values_to = "num",
+                      names_pattern = "num_(.*)_prof") %>% 
+  select(c("fed_id","univ_name","state","tier","rank","num"))
+
+# join the data frames
+d1 <- full_join(salary,comp) # dummy transition data frame
+df <- full_join(d1,number) # overwrite original df dataframe with this tidy version
+
+```
+
+Here is how the tidied dataset looks:
+
+```{r tidy_set}
+head(df) %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_classic(lightable_options="hover")
+```
+
+The data was then plotted. The tier **VIIB** is not included because it only contained three observations. There was no need to show a boxplot of them.
+
+```{r data_one_plot}
+# capitalize ranks for plotting
+df$rank <-  str_to_title(df$rank) 
+# plot the data
+df[df$tier != "VIIB",] %>% # tier VIIB only has three observations, it will not be plotted here
+  ggplot(aes(x=rank,y=avg_salary, fill=rank)) +
+  geom_boxplot() +
+  facet_wrap(~tier) +
+  labs(x="Rank", y="Salary", fill="Rank") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 60, vjust = 1, hjust=1))
+```
+
+#### Task 2: Build an ANOVA model and display the summary output
+
+```{r anova_prof}
+#### build an ANOVA model ####
+mod <- aov(avg_salary ~ state + tier + rank, data = df)
+summary(mod)
+```
+
+#### Task 3: Load in and clean **Juniper_Oils.csv** 
+
+```{r data_two_tidy}
+#### load in and clean the second data set ####
+d1 <- read_csv("Juniper_Oils.csv") %>% 
+  pivot_longer(cols=c("alpha-pinene","para-cymene","alpha-terpineol","cedr-9-ene",
+                      "alpha-cedrene","beta-cedrene","cis-thujopsene","alpha-himachalene",
+                      "beta-chamigrene","cuparene","compound 1","alpha-chamigrene","widdrol",
+                      "cedrol","beta-acorenol","alpha-acorenol","gamma-eudesmol","beta-eudesmol",
+                      "alpha-eudesmol","cedr-8-en-13-ol","cedr-8-en-15-ol","compound 2","thujopsenal"),
+               names_to="ChemicalID",
+               values_to="Concentration")
+```
+
+#### Task 4: Graph the cleaned data from **Juniper_Oils.csv** 
+
+```{r data_two_plot}
+# plot the data
+d1 %>% 
+  ggplot(aes(x=YearsSinceBurn, y=Concentration)) +
+  geom_smooth()+
+  facet_wrap(~ChemicalID, scale="free") + 
+  theme_minimal()
+```
+
+#### Task 5: Build a generalized linear model of the concentrations
+
+```{r glm_juniper}
+#### build a general model ####
+mod2 <- glm(Concentration ~ ChemicalID*YearsSinceBurn, data = d1)
+d2 <- tidy(mod2)
+d2$term <- sub("^ChemicalID", "", d2$term)
+d2[d2$p.value < 0.05,]
+```
+

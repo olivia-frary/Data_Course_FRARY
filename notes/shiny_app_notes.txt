@@ -1,0 +1,35 @@
+Shiny App Notes
+Write code to server
+Upload to ui
+
+server
+listens for input to make changes to plot
+passes output to the ui
+
+
+
+biostrings
+
+ShortRead - gives read fasta
+
+
+devtools::install_github(gzahn/CommunityAssemblR)
+roxygen2::roxygenise()
+
+Have some kind of model have a response variable, lateness
+
+Okay so make a model with the order, captivity, genome size, to predict the binary of whether or not the homogametic lifespan lives longer
+
+look up chatgpt
+
+ShinyUiEditer
+
+
+Bioconductor
+
+ggtree
+
+unlist your dnaStringSet and call each DNAstring
+
+r for datascience
+written with the bookdown package
