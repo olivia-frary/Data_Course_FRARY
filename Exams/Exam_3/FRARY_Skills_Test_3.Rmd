@@ -1,6 +1,5 @@
 ---
 title: "Exam 3"
-author: "Olivia Frary"
 output: 
   html_document:
     toc: true
@@ -115,6 +114,8 @@ d1 %>%
 ```
 
 #### Task 5: Build a generalized linear model of the concentrations
+
+Only significant values from the model will be displayed.
 
 ```{r glm_juniper}
 #### build a general model ####
